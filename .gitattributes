@@ -1,0 +1,12 @@
+# Keep shipped build artifacts byte-identical regardless of the consumer's
+# core.autocrlf setting: the macOS .app carries a code signature and dist/ is
+# loaded verbatim by Node / the browser module loader.
+native/** binary
+dist/*.js text eol=lf
+*.exe binary
+*.wav binary
+*.png binary
+*.md text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+LICENSE text eol=lf

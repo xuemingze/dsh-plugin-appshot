@@ -1,0 +1,95 @@
+{
+  "name": "dsh-plugin-appshot",
+  "version": "0.4.3",
+  "description": "dsh-plugin-appshot — a DeepSeek Harness plugin for macOS and Windows context screenshot capture. (patched fork: declares the react runtime dependency required by the host bundle)",
+  "license": "MIT",
+  "author": "TaurusWood",
+  "contributors": [
+    "xuemingze"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xuemingze/dsh-plugin-appshot.git"
+  },
+  "homepage": "https://github.com/xuemingze/dsh-plugin-appshot#readme",
+  "bugs": {
+    "url": "https://github.com/xuemingze/dsh-plugin-appshot/issues"
+  },
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "appshot",
+    "screenshot",
+    "screencapturekit",
+    "macos",
+    "windows",
+    "win32",
+    "agent",
+    "context"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./client": "./dist/client.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "dist",
+    "cordis.patch.yml",
+    "CHANGELOG.md",
+    "CHANGELOG.zh-CN.md",
+    "native/macos/.build/Appshot Agent.app",
+    "native/windows/bin/win-x64"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ],
+      "immediately": false
+    }
+  },
+  "dependencies": {
+    "react": "^18.2.0"
+  },
+  "scripts": {
+    "prepack": "node scripts/prepack.mjs",
+    "build": "npx esbuild src/index.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/index.js && npx esbuild src/client.ts --bundle --platform=browser --format=cjs --external:react --external:react-dom --external:react/jsx-runtime --banner:js=\"window.__ModuleLoader__.load({ id: 'dsh-plugin-appshot', factory: (require) => { var module = { exports: {} }; var exports = module.exports;\" --footer:js=\"return module.exports; } });\" --outfile=dist/client.js",
+    "build:native": "./native/macos/scripts/build-app.sh",
+    "build:native:windows": "dotnet publish native/windows/AppshotWin.csproj -c Release -o native/windows/bin/win-x64",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node scripts/run-tests.ts",
+    "test:windows": "node scripts/run-tests.ts --windows",
+    "test:macos": "node scripts/run-tests.ts --macos",
+    "test:all": "node scripts/run-tests.ts --all",
+    "test:native": "dotnet test native/windows/AppshotWin.Tests/AppshotWin.Tests.csproj",
+    "test:typecheck": "tsc -p tsconfig.tests.json --noEmit",
+    "changelog": "node scripts/gen-changelog.ts",
+    "release": "pnpm run changelog && git add CHANGELOG.md CHANGELOG.zh-CN.md && bumpp --all --commit \"chore: release v%s\" --tag \"v%s\" --push"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "0.1.0-rc.6",
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.31",
+    "bumpp": "^12.2.1",
+    "conventional-changelog-cli": "^5.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.6.0"
+  },
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621"
+}
